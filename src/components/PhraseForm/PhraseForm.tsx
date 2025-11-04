@@ -9,10 +9,20 @@ import { useTheme } from '../../context/ThemeContext';
 
 const FormContainer = styled.form`
   display: flex;
+  flex-direction: column;
   gap: 1rem;
   width: 100%;
   max-width: 600px;
   margin: 0 auto;
+`;
+
+const InputRow = styled.div`
+  display: flex;
+  gap: 1rem;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `;
 
 const Input = styled.input<{ $isRetro: boolean; $colors: any }>`
@@ -107,6 +117,7 @@ const Button = styled.button<{ $isRetro: boolean; $colors: any }>`
 
 export default function PhraseForm() {
   const [inputValue, setInputValue] = useState('');
+  const [authorValue, setAuthorValue] = useState('');
   const { addPhrase } = usePhrases();
   const { theme, colors } = useTheme();
   const isRetro = theme === 'retro';
@@ -120,17 +131,23 @@ export default function PhraseForm() {
     setInputValue(e.target.value);
   };
 
+  const handleAuthorChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setAuthorValue(e.target.value);
+  };
+
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const trimmedValue = inputValue.trim();
+    const trimmedAuthor = authorValue.trim();
 
     if (trimmedValue.length === 0) {
       return;
     }
 
-    addPhrase(trimmedValue);
+    addPhrase(trimmedValue, trimmedAuthor || undefined);
     setInputValue('');
+    setAuthorValue('');
   };
 
   return (
@@ -145,9 +162,21 @@ export default function PhraseForm() {
         $isRetro={isRetro}
         $colors={colors}
       />
-      <Button type="submit" disabled={!isValid} $isRetro={isRetro} $colors={colors}>
-        Agregar
-      </Button>
+      <InputRow>
+        <Input
+          type="text"
+          value={authorValue}
+          onChange={handleAuthorChange}
+          placeholder="Autor (opcional)"
+          aria-label="Autor"
+          autoComplete="off"
+          $isRetro={isRetro}
+          $colors={colors}
+        />
+        <Button type="submit" disabled={!isValid} $isRetro={isRetro} $colors={colors}>
+          Agregar
+        </Button>
+      </InputRow>
     </FormContainer>
   );
 }

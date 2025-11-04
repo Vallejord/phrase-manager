@@ -60,17 +60,29 @@ const PhraseText = styled.p`
 
 const CardFooter = styled.div`
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
+  flex-direction: column;
+  gap: 0.5rem;
   margin-top: auto;
   padding-top: 0.5rem;
   border-top: 1px solid #f0f0f0;
 `;
 
-const DateText = styled.time`
+const CardMeta = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+`;
+
+const AuthorText = styled.div`
   font-size: 0.85rem;
   color: #666;
+  font-weight: 600;
+`;
+
+const DateText = styled.time`
+  font-size: 0.75rem;
+  color: #999;
   font-style: italic;
 `;
 
@@ -153,16 +165,21 @@ function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
     <Card $isRetro={isRetro} $colors={colors}>
       <PhraseText>{phrase.text}</PhraseText>
       <CardFooter>
-        <DateText dateTime={new Date(phrase.createdAt).toISOString()}>
-          {formatDate(phrase.createdAt)}
-        </DateText>
-        <DeleteButton
-          onClick={handleDelete}
-          aria-label={`Eliminar frase: ${phrase.text}`}
-          $isRetro={isRetro}
-        >
-          Eliminar
-        </DeleteButton>
+        <CardMeta>
+          <div>
+            <AuthorText>— {phrase.author}</AuthorText>
+            <DateText dateTime={new Date(phrase.createdAt).toISOString()}>
+              {formatDate(phrase.createdAt)}
+            </DateText>
+          </div>
+          <DeleteButton
+            onClick={handleDelete}
+            aria-label={`Eliminar frase: ${phrase.text}`}
+            $isRetro={isRetro}
+          >
+            Eliminar
+          </DeleteButton>
+        </CardMeta>
       </CardFooter>
     </Card>
   );
@@ -174,4 +191,5 @@ function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
 
 // Usar React.memo para evitar re-renders innecesarios
 export default memo(PhraseCard);
+
 

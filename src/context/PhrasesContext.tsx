@@ -1,4 +1,10 @@
-import { createContext, useContext, useReducer, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+
+// ============================================================================
+// Constants
+// ============================================================================
+
+const STORAGE_KEY = 'phrases-app-data';
 
 // ============================================================================
 // Types & Interfaces
@@ -7,6 +13,7 @@ import { createContext, useContext, useReducer, ReactNode } from 'react';
 export interface Phrase {
   id: string;
   text: string;
+  author: string;
   createdAt: number;
 }
 
@@ -16,24 +23,58 @@ interface PhrasesState {
 }
 
 type PhrasesAction =
-  | { type: 'ADD_PHRASE'; payload: string }
+  | { type: 'ADD_PHRASE'; payload: { text: string; author: string } }
   | { type: 'DELETE_PHRASE'; payload: string }
   | { type: 'SET_SEARCH_TERM'; payload: string };
 
 interface PhrasesContextType extends PhrasesState {
-  addPhrase: (text: string) => void;
+  addPhrase: (text: string, author?: string) => void;
   deletePhrase: (id: string) => void;
   setSearchTerm: (term: string) => void;
+}
+
+// ============================================================================
+// Utility Functions
+// ============================================================================
+
+function loadFromStorage(): PhrasesState {
+  if (typeof window === 'undefined') {
+    return { phrases: [], searchTerm: '' };
+  }
+
+  try {
+    const stored = window.localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      return {
+        phrases: parsed.phrases || [],
+        searchTerm: '', // No persistimos el searchTerm
+      };
+    }
+  } catch (error) {
+    console.error('Error loading from localStorage:', error);
+  }
+
+  return { phrases: [], searchTerm: '' };
+}
+
+function saveToStorage(state: PhrasesState): void {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+      phrases: state.phrases,
+    }));
+  } catch (error) {
+    console.error('Error saving to localStorage:', error);
+  }
 }
 
 // ============================================================================
 // Initial State
 // ============================================================================
 
-const initialState: PhrasesState = {
-  phrases: [],
-  searchTerm: '',
-};
+const initialState: PhrasesState = loadFromStorage();
 
 // ============================================================================
 // Reducer
@@ -44,7 +85,8 @@ function phrasesReducer(state: PhrasesState, action: PhrasesAction): PhrasesStat
     case 'ADD_PHRASE': {
       const newPhrase: Phrase = {
         id: crypto.randomUUID(),
-        text: action.payload,
+        text: action.payload.text,
+        author: action.payload.author || 'Desconocido',
         createdAt: Date.now(),
       };
       return {
@@ -89,8 +131,13 @@ interface PhrasesProviderProps {
 export function PhrasesProvider({ children }: PhrasesProviderProps) {
   const [state, dispatch] = useReducer(phrasesReducer, initialState);
 
-  const addPhrase = (text: string) => {
-    dispatch({ type: 'ADD_PHRASE', payload: text });
+  // Guardar en localStorage cada vez que cambie el estado
+  useEffect(() => {
+    saveToStorage(state);
+  }, [state.phrases]); // Solo cuando cambian las frases
+
+  const addPhrase = (text: string, author?: string) => {
+    dispatch({ type: 'ADD_PHRASE', payload: { text, author: author || 'Desconocido' } });
   };
 
   const deletePhrase = (id: string) => {

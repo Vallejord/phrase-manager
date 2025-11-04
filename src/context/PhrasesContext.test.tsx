@@ -47,6 +47,7 @@ describe('PhrasesContext', () => {
       expect(result.current.phrases[0]).toMatchObject({
         id: expect.any(String),
         text: 'Mi primera frase',
+        author: 'Desconocido',
         createdAt: expect.any(Number),
       });
     });
@@ -65,6 +66,19 @@ describe('PhrasesContext', () => {
       expect(result.current.phrases[0].id).not.toBe(result.current.phrases[1].id);
       expect(result.current.phrases[0].text).toBe('Primera frase');
       expect(result.current.phrases[1].text).toBe('Segunda frase');
+    });
+
+    it('should add a phrase with custom author', () => {
+      const { result } = renderHook(() => usePhrases(), {
+        wrapper: PhrasesProvider,
+      });
+
+      act(() => {
+        result.current.addPhrase('Frase con autor', 'John Doe');
+      });
+
+      expect(result.current.phrases).toHaveLength(1);
+      expect(result.current.phrases[0].author).toBe('John Doe');
     });
 
     it('should provide deletePhrase function', () => {
