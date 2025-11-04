@@ -4,14 +4,17 @@ Una aplicación web moderna para gestionar y buscar frases, desarrollada con Rea
 
 ## ✨ Características
 
-- ✅ **Agregar frases** con validación en tiempo real
-- 🔍 **Búsqueda en tiempo real** con filtrado case-insensitive
+- ✅ **Agregar frases** con validación en tiempo real y campo de autor opcional
+- 👤 **Autoría de frases** con campo opcional (por defecto "Desconocido")
+- 🔍 **Búsqueda inteligente** en tiempo real por frase o autor (case-insensitive)
+- 💾 **Persistencia local** con localStorage - tus frases se guardan automáticamente
+- 🎨 **Toggle de tema** - Alterna entre diseño moderno y retro 90s
+- 🕹️ **Estilo retro auténtico** - Diseño nostálgico con colores neón, bordes 3D y animaciones
 - 🗑️ **Eliminar frases** con confirmación visual
 - 📱 **Diseño responsivo** que se adapta a móviles, tablets y escritorio
-- 🎨 **UI moderna** con gradientes, glassmorphism y animaciones suaves
 - ♿ **Totalmente accesible** con ARIA labels y navegación por teclado
 - ⚡ **Optimizado** con React.memo, useMemo y useCallback
-- 🧪 **100% testeado** con 60 tests usando Vitest y React Testing Library
+- 🧪 **100% testeado** con 75 tests usando Vitest y React Testing Library
 
 ## 🚀 Tecnologías Principales
 
@@ -21,9 +24,10 @@ Una aplicación web moderna para gestionar y buscar frases, desarrollada con Rea
 - **Vite** - Build tool ultra-rápido
 
 ### Estado y Arquitectura
-- **Context API + useReducer** - Gestión de estado global
-- **Custom Hooks** - Lógica reutilizable (`usePhrasesFilter`)
-- **Styled Components** - CSS-in-JS con tipado
+- **Context API + useReducer** - Gestión de estado global (PhrasesContext, ThemeContext)
+- **Custom Hooks** - Lógica reutilizable (`usePhrasesFilter`, `useLocalStorage`)
+- **localStorage** - Persistencia automática de datos
+- **Styled Components** - CSS-in-JS con tipado y temas dinámicos
 
 ### Testing
 - **Vitest** - Test runner (compatible con Jest)
@@ -66,19 +70,22 @@ npm run preview
 ```
 src/
 ├── components/
-│   ├── PhraseCard/          # Tarjeta individual de frase
-│   ├── PhraseForm/          # Formulario para agregar frases
+│   ├── PhraseCard/          # Tarjeta individual de frase con autor
+│   ├── PhraseForm/          # Formulario con campos de frase y autor
 │   ├── PhraseGrid/          # Grid de frases con filtrado
-│   └── SearchBar/           # Barra de búsqueda
+│   ├── SearchBar/           # Búsqueda por frase o autor
+│   └── ThemeToggle/         # Switch para alternar temas
 ├── context/
-│   └── PhrasesContext.tsx   # Estado global con Context API
+│   ├── PhrasesContext.tsx   # Estado global de frases con persistencia
+│   └── ThemeContext.tsx     # Estado global de temas (modern/retro)
 ├── hooks/
-│   └── usePhrasesFilter.ts  # Hook de filtrado optimizado
+│   ├── usePhrasesFilter.ts  # Filtrado optimizado por texto y autor
+│   └── useLocalStorage.ts   # Sincronización con localStorage
 ├── test/
 │   └── setup.js            # Configuración de tests
-├── App.tsx                 # Componente principal
-├── main.tsx               # Entry point con Provider
-└── index.css              # Estilos globales
+├── App.tsx                 # Componente principal con theming
+├── main.tsx               # Entry point con múltiples Providers
+└── index.css              # Estilos globales y resets
 ```
 
 ## 🧪 Estrategia de Testing (TDD)
@@ -91,14 +98,16 @@ El proyecto fue desarrollado siguiendo **Test-Driven Development**:
 
 ### Cobertura de Tests
 
-- **PhrasesContext**: 10 tests - Gestión de estado
-- **PhraseForm**: 10 tests - Validación y entrada de datos
-- **PhraseCard**: 10 tests - Renderizado y eliminación
+- **PhrasesContext**: 11 tests - Gestión de estado y persistencia
+- **ThemeContext**: 8 tests - Gestión de temas (modern/retro)
+- **PhraseForm**: 10 tests - Validación, frase y autor
+- **PhraseCard**: 10 tests - Renderizado con autor y eliminación
 - **PhraseGrid**: 13 tests - Filtrado y estados vacíos
-- **SearchBar**: 11 tests - Búsqueda y limpieza
+- **SearchBar**: 11 tests - Búsqueda por frase o autor
+- **ThemeToggle**: 6 tests - Toggle switch y accesibilidad
 - **App Integration**: 6 tests - Flujos completos end-to-end
 
-**Total: 60 tests pasando ✅**
+**Total: 75 tests pasando ✅**
 
 ## 🎯 Conceptos Avanzados de React Implementados
 
@@ -106,10 +115,11 @@ El proyecto fue desarrollado siguiendo **Test-Driven Development**:
 - `useState` - Estado local de componentes
 - `useReducer` - Estado complejo con acciones
 - `useContext` - Consumo de contexto
-- `useMemo` - Memoización de cálculos
+- `useEffect` - Side effects y persistencia en localStorage
+- `useMemo` - Memoización de cálculos (filtrado)
 - `useCallback` - Memoización de funciones
 - `useRef` - Referencias a elementos DOM
-- **Custom Hooks** - `usePhrases`, `usePhrasesFilter`
+- **Custom Hooks** - `usePhrases`, `usePhrasesFilter`, `useTheme`, `useLocalStorage`
 
 ### Patrones de Optimización
 - **React.memo** - Prevenir re-renders innecesarios en `PhraseCard`
@@ -133,13 +143,26 @@ El proyecto fue desarrollado siguiendo **Test-Driven Development**:
 
 ## 🎨 Características de UI/UX
 
-- **Gradiente de fondo** con colores modernos
+### Tema Moderno
+- **Gradiente de fondo** con colores vibrantes
 - **Glassmorphism** en secciones
-- **Hover effects** con transforms y shadows
+- **Hover effects** suaves con transforms y shadows
+- **Bordes redondeados** y diseño minimalista
+
+### Tema Retro 90s
+- **Gradiente animado** con colores neón (magenta, cyan, amarillo)
+- **Bordes 3D** con efecto ridge y sombras duras
+- **Fuentes retro** - Courier New y Comic Sans
+- **Colores vibrantes** - Azul, verde, rojo, amarillo intensos
+- **Estrellas parpadeantes** en el header
+- **Efectos de Windows 95** - Bordes outset/inset
+
+### General
+- **Toggle switch** estilo iOS para cambiar temas
 - **Estados vacíos** informativos con emojis
 - **Transiciones suaves** en todas las interacciones
 - **Responsive grid** con CSS Grid auto-fill
-- **Accesibilidad completa** con ARIA labels
+- **Accesibilidad completa** con ARIA labels y role attributes
 
 ## 📝 Scripts Disponibles
 
@@ -158,6 +181,31 @@ npm run preview         # Preview de build
 
 # Linting
 npm run lint            # Ejecuta ESLint
+```
+
+## 💾 Persistencia de Datos
+
+La aplicación guarda automáticamente todas las frases en el **localStorage** del navegador:
+
+- ✅ **Guardado automático** - Cada vez que agregas o eliminas una frase
+- ✅ **Carga automática** - Al recargar la página, tus frases persisten
+- ✅ **Manejo de errores** - Try-catch para prevenir fallos
+- ✅ **SSR-safe** - Verificaciones de `window` para compatibilidad
+- ✅ **Key única** - `phrases-app-data` en localStorage
+- ⚡ **No persiste el searchTerm** - La búsqueda se reinicia al recargar
+
+### Estructura en localStorage
+```json
+{
+  "phrases": [
+    {
+      "id": "uuid-v4",
+      "text": "Mi frase inspiradora",
+      "author": "John Doe",
+      "createdAt": 1699123456789
+    }
+  ]
+}
 ```
 
 ## 🛠️ Decisiones Técnicas
@@ -179,12 +227,14 @@ Para este MVP, Context + useReducer es suficiente y reduce complejidad sin sacri
 
 ## 📊 Métricas del Proyecto
 
-- **60 tests** con 100% de éxito
-- **6 componentes** principales
-- **1 custom hook** de utilidad
+- **75 tests** con 100% de éxito
+- **8 componentes** principales (incluye ThemeToggle)
+- **2 contextos** globales (PhrasesContext, ThemeContext)
+- **3 custom hooks** de utilidad (usePhrasesFilter, useLocalStorage, useTheme)
 - **TypeScript strict mode** habilitado
-- **Build size**: ~74KB gzipped
-- **Tiempo de build**: < 500ms
+- **localStorage** para persistencia de datos
+- **Build size**: ~75KB gzipped
+- **Tiempo de build**: < 600ms
 
 ## 🤝 Contribuir
 
