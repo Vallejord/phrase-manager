@@ -2,15 +2,22 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PhrasesProvider } from '../../context/PhrasesContext';
+import { ThemeProvider } from '../../context/ThemeContext';
 import PhraseForm from './PhraseForm';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      <PhrasesProvider>
+        {ui}
+      </PhrasesProvider>
+    </ThemeProvider>
+  );
+};
 
 describe('PhraseForm', () => {
   it('should render input and submit button', () => {
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     expect(screen.getByPlaceholderText(/escribe una frase/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /agregar/i })).toBeInTheDocument();
@@ -19,11 +26,7 @@ describe('PhraseForm', () => {
   it('should update input value when typing', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const input = screen.getByPlaceholderText(/escribe una frase/i);
     
@@ -35,11 +38,7 @@ describe('PhraseForm', () => {
   it('should clear input after submitting', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const input = screen.getByPlaceholderText(/escribe una frase/i);
     const button = screen.getByRole('button', { name: /agregar/i });
@@ -53,11 +52,7 @@ describe('PhraseForm', () => {
   it('should not submit empty phrase', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const button = screen.getByRole('button', { name: /agregar/i });
     
@@ -70,11 +65,7 @@ describe('PhraseForm', () => {
   it('should not submit phrase with only whitespace', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const input = screen.getByPlaceholderText(/escribe una frase/i);
     const button = screen.getByRole('button', { name: /agregar/i });
@@ -87,11 +78,7 @@ describe('PhraseForm', () => {
   it('should enable button when input has valid text', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const input = screen.getByPlaceholderText(/escribe una frase/i);
     const button = screen.getByRole('button', { name: /agregar/i });
@@ -106,11 +93,7 @@ describe('PhraseForm', () => {
   it('should handle form submission with Enter key', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const input = screen.getByPlaceholderText(/escribe una frase/i);
     
@@ -123,11 +106,7 @@ describe('PhraseForm', () => {
   it('should trim whitespace from submitted phrase', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     const input = screen.getByPlaceholderText(/escribe una frase/i);
     const button = screen.getByRole('button', { name: /agregar/i });
@@ -140,11 +119,7 @@ describe('PhraseForm', () => {
   });
 
   it('should have accessible label for input', () => {
-    render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<PhraseForm />);
 
     // El input debe tener un label asociado o aria-label
     const input = screen.getByPlaceholderText(/escribe una frase/i);
@@ -155,11 +130,7 @@ describe('PhraseForm', () => {
     const user = userEvent.setup();
     const mockSubmit = vi.fn((e: Event) => e.preventDefault());
     
-    const { container } = render(
-      <PhrasesProvider>
-        <PhraseForm />
-      </PhrasesProvider>
-    );
+    const { container } = renderWithProviders(<PhraseForm />);
 
     const form = container.querySelector('form');
     if (form) {

@@ -1,6 +1,7 @@
 import { useRef, ChangeEvent } from 'react';
 import styled from 'styled-components';
 import { usePhrases } from '../../context/PhrasesContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // ============================================================================
 // Styled Components
@@ -13,19 +14,30 @@ const SearchContainer = styled.div`
   margin: 0 auto;
 `;
 
-const SearchWrapper = styled.div`
+const SearchWrapper = styled.div<{ $isRetro: boolean; $colors: any }>`
   position: relative;
   display: flex;
   align-items: center;
-  background: white;
-  border: 2px solid #e0e0e0;
-  border-radius: 8px;
   transition: all 0.2s ease;
-
-  &:focus-within {
-    border-color: #646cff;
-    box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
-  }
+  
+  ${props => props.$isRetro ? `
+    background: ${props.$colors.inputBackground};
+    border: 3px inset ${props.$colors.inputBorder};
+    
+    &:focus-within {
+      outline: 2px solid #0000ff;
+      outline-offset: 2px;
+    }
+  ` : `
+    background: white;
+    border: 2px solid ${props.$colors.inputBorder};
+    border-radius: 8px;
+    
+    &:focus-within {
+      border-color: ${props.$colors.primary};
+      box-shadow: 0 0 0 3px rgba(100, 108, 255, 0.1);
+    }
+  `}
 `;
 
 const SearchIcon = styled.span`
@@ -36,42 +48,61 @@ const SearchIcon = styled.span`
   pointer-events: none;
 `;
 
-const Input = styled.input`
+const Input = styled.input<{ $isRetro: boolean }>`
   flex: 1;
   padding: 0.75rem 1rem 0.75rem 3rem;
   font-size: 1rem;
   border: none;
   outline: none;
   background: transparent;
+  font-family: ${props => props.$isRetro ? 'Comic Sans MS, Arial, cursive' : 'inherit'};
   
   &::placeholder {
     color: #999;
   }
 `;
 
-const ClearButton = styled.button`
+const ClearButton = styled.button<{ $isRetro: boolean }>`
   position: absolute;
   right: 0.5rem;
   padding: 0.5rem;
   font-size: 1.2rem;
-  color: #666;
-  background: transparent;
-  border: none;
-  border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
   align-items: center;
   justify-content: center;
 
-  &:hover {
-    background: #f0f0f0;
-    color: #333;
-  }
-
-  &:active {
-    transform: scale(0.95);
-  }
+  ${props => props.$isRetro ? `
+    color: #000;
+    background: #ffff00;
+    border: 2px outset #c0c0c0;
+    box-shadow: 2px 2px 0px #808080;
+    
+    &:hover {
+      background: #cccc00;
+    }
+    
+    &:active {
+      border-style: inset;
+      box-shadow: inset 1px 1px 0px #808080;
+      transform: translate(1px, 1px);
+    }
+  ` : `
+    color: #666;
+    background: transparent;
+    border: none;
+    border-radius: 4px;
+    
+    &:hover {
+      background: #f0f0f0;
+      color: #333;
+    }
+    
+    &:active {
+      transform: scale(0.95);
+    }
+  `}
 `;
 
 // ============================================================================
@@ -80,7 +111,9 @@ const ClearButton = styled.button`
 
 export default function SearchBar() {
   const { searchTerm, setSearchTerm } = usePhrases();
+  const { theme, colors } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
+  const isRetro = theme === 'retro';
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -94,7 +127,7 @@ export default function SearchBar() {
 
   return (
     <SearchContainer>
-      <SearchWrapper>
+      <SearchWrapper $isRetro={isRetro} $colors={colors}>
         <SearchIcon aria-hidden="true">🔍</SearchIcon>
         <Input
           ref={inputRef}
@@ -104,12 +137,14 @@ export default function SearchBar() {
           placeholder="Buscar frases..."
           aria-label="Buscar frases"
           autoComplete="off"
+          $isRetro={isRetro}
         />
         {searchTerm && (
           <ClearButton
             type="button"
             onClick={handleClear}
             aria-label="Limpiar búsqueda"
+            $isRetro={isRetro}
           >
             ✕
           </ClearButton>

@@ -1,8 +1,17 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { ThemeProvider } from '../../context/ThemeContext';
 import PhraseCard from './PhraseCard';
 import type { Phrase } from '../../context/PhrasesContext';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      {ui}
+    </ThemeProvider>
+  );
+};
 
 describe('PhraseCard', () => {
   const mockPhrase: Phrase = {
@@ -14,7 +23,7 @@ describe('PhraseCard', () => {
   it('should render phrase text', () => {
     const mockOnDelete = vi.fn();
     
-    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     expect(screen.getByText('Esta es una frase de prueba')).toBeInTheDocument();
   });
@@ -22,7 +31,7 @@ describe('PhraseCard', () => {
   it('should render delete button', () => {
     const mockOnDelete = vi.fn();
     
-    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });
     expect(deleteButton).toBeInTheDocument();
@@ -32,7 +41,7 @@ describe('PhraseCard', () => {
     const user = userEvent.setup();
     const mockOnDelete = vi.fn();
     
-    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });
     await user.click(deleteButton);
@@ -49,7 +58,7 @@ describe('PhraseCard', () => {
       createdAt: new Date('2024-01-15T10:30:00').getTime(),
     };
     
-    render(<PhraseCard phrase={phraseWithDate} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={phraseWithDate} onDelete={mockOnDelete} />);
     
     // Verificar que hay alguna fecha visible (el formato exacto puede variar)
     const dateElement = screen.getByText(/\d{1,2}\/\d{1,2}\/\d{4}|\d{1,2} de \w+ de \d{4}/i);
@@ -59,7 +68,7 @@ describe('PhraseCard', () => {
   it('should have accessible delete button', () => {
     const mockOnDelete = vi.fn();
     
-    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });
     expect(deleteButton).toHaveAttribute('aria-label');
@@ -70,10 +79,10 @@ describe('PhraseCard', () => {
     const phrase1: Phrase = { id: '1', text: 'Primera frase', createdAt: Date.now() };
     const phrase2: Phrase = { id: '2', text: 'Segunda frase', createdAt: Date.now() };
     
-    const { rerender } = render(<PhraseCard phrase={phrase1} onDelete={mockOnDelete} />);
+    const { rerender } = renderWithProviders(<PhraseCard phrase={phrase1} onDelete={mockOnDelete} />);
     expect(screen.getByText('Primera frase')).toBeInTheDocument();
     
-    rerender(<PhraseCard phrase={phrase2} onDelete={mockOnDelete} />);
+    rerender(<ThemeProvider><PhraseCard phrase={phrase2} onDelete={mockOnDelete} /></ThemeProvider>);
     expect(screen.getByText('Segunda frase')).toBeInTheDocument();
   });
 
@@ -86,7 +95,7 @@ describe('PhraseCard', () => {
       createdAt: Date.now(),
     };
     
-    render(<PhraseCard phrase={longPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={longPhrase} onDelete={mockOnDelete} />);
     
     // Verificar que el texto se renderiza (aunque sea largo)
     expect(screen.getByText(longText)).toBeInTheDocument();
@@ -96,7 +105,7 @@ describe('PhraseCard', () => {
     const user = userEvent.setup();
     const mockOnDelete = vi.fn();
     
-    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });
     
@@ -113,7 +122,7 @@ describe('PhraseCard', () => {
     const user = userEvent.setup();
     const mockOnDelete = vi.fn();
     
-    const { container } = render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    const { container } = renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     const card = container.firstChild as HTMLElement;
     
@@ -131,7 +140,7 @@ describe('PhraseCard', () => {
       createdAt: Date.now(),
     };
     
-    render(<PhraseCard phrase={emptyPhrase} onDelete={mockOnDelete} />);
+    renderWithProviders(<PhraseCard phrase={emptyPhrase} onDelete={mockOnDelete} />);
     
     // La card debe renderizarse aunque el texto esté vacío
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });

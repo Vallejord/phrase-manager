@@ -2,15 +2,22 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PhrasesProvider } from '../../context/PhrasesContext';
+import { ThemeProvider } from '../../context/ThemeContext';
 import SearchBar from './SearchBar';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      <PhrasesProvider>
+        {ui}
+      </PhrasesProvider>
+    </ThemeProvider>
+  );
+};
 
 describe('SearchBar', () => {
   it('should render search input', () => {
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     expect(screen.getByPlaceholderText(/buscar frases/i)).toBeInTheDocument();
   });
@@ -18,11 +25,7 @@ describe('SearchBar', () => {
   it('should update input value when typing', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     
@@ -32,11 +35,7 @@ describe('SearchBar', () => {
   });
 
   it('should have a search icon', () => {
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     // Verificar que hay algún ícono de búsqueda (puede ser emoji o SVG)
     const searchIcon = screen.getByText(/🔍/);
@@ -46,11 +45,7 @@ describe('SearchBar', () => {
   it('should show clear button when input has text', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     
@@ -62,11 +57,7 @@ describe('SearchBar', () => {
   });
 
   it('should not show clear button when input is empty', () => {
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     // No debe haber botón de limpiar
     const clearButton = screen.queryByRole('button', { name: /limpiar/i });
@@ -76,11 +67,7 @@ describe('SearchBar', () => {
   it('should clear input when clear button is clicked', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     
@@ -94,11 +81,7 @@ describe('SearchBar', () => {
   });
 
   it('should have accessible label', () => {
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     expect(input).toHaveAttribute('aria-label');
@@ -107,11 +90,7 @@ describe('SearchBar', () => {
   it('should update context search term when typing', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     await user.type(input, 'test');
@@ -123,11 +102,7 @@ describe('SearchBar', () => {
   it('should handle rapid typing', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     
@@ -139,11 +114,7 @@ describe('SearchBar', () => {
   it('should maintain focus after clearing', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     
@@ -159,11 +130,7 @@ describe('SearchBar', () => {
   it('should handle special characters in search', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <SearchBar />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<SearchBar />);
 
     const input = screen.getByPlaceholderText(/buscar frases/i);
     await user.type(input, '!@#$%^&*()');

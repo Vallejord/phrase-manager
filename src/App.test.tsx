@@ -2,25 +2,28 @@ import { describe, it, expect } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PhrasesProvider } from './context/PhrasesContext';
+import { ThemeProvider } from './context/ThemeContext';
 import App from './App';
+
+const renderWithProviders = (ui: React.ReactElement) => {
+  return render(
+    <ThemeProvider>
+      <PhrasesProvider>
+        {ui}
+      </PhrasesProvider>
+    </ThemeProvider>
+  );
+};
 
 describe('App - Integration Tests', () => {
   it('should render main title', () => {
-    render(
-      <PhrasesProvider>
-        <App />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<App />);
     
     expect(screen.getByText(/gestor de frases/i)).toBeInTheDocument();
   });
 
   it('should render all main sections', () => {
-    render(
-      <PhrasesProvider>
-        <App />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<App />);
     
     // Form section
     expect(screen.getByPlaceholderText(/escribe una frase/i)).toBeInTheDocument();
@@ -36,11 +39,7 @@ describe('App - Integration Tests', () => {
   it('should add a phrase and display it', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <App />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<App />);
     
     // Agregar una frase
     const input = screen.getByPlaceholderText(/escribe una frase/i);
@@ -59,11 +58,7 @@ describe('App - Integration Tests', () => {
   it('should search phrases', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <App />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<App />);
     
     // Agregar dos frases
     const phraseInput = screen.getByPlaceholderText(/escribe una frase/i);
@@ -87,11 +82,7 @@ describe('App - Integration Tests', () => {
   it('should delete a phrase', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <App />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<App />);
     
     // Agregar una frase
     const input = screen.getByPlaceholderText(/escribe una frase/i);
@@ -116,11 +107,7 @@ describe('App - Integration Tests', () => {
   it('should clear search when clear button is clicked', async () => {
     const user = userEvent.setup();
     
-    render(
-      <PhrasesProvider>
-        <App />
-      </PhrasesProvider>
-    );
+    renderWithProviders(<App />);
     
     // Agregar frases
     const phraseInput = screen.getByPlaceholderText(/escribe una frase/i);

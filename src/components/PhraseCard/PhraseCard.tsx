@@ -1,29 +1,51 @@
 import { memo } from 'react';
 import styled from 'styled-components';
+import { useTheme } from '../../context/ThemeContext';
 import type { Phrase } from '../../context/PhrasesContext';
 
 // ============================================================================
 // Styled Components
 // ============================================================================
 
-const Card = styled.article`
+const Card = styled.article<{ $isRetro: boolean; $colors: any }>`
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
   padding: 1.5rem;
-  background: white;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
   transition: all 0.2s ease;
   position: relative;
   overflow: hidden;
+  font-family: ${props => props.$isRetro ? 'Comic Sans MS, Arial, cursive' : 'inherit'};
 
-  &:hover {
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    transform: translateY(-2px);
-    border-color: #646cff;
-  }
+  ${props => props.$isRetro ? `
+    background: ${props.$colors.cardBackground};
+    border: 4px outset #c0c0c0;
+    box-shadow: 5px 5px 0px #808080;
+    
+    &:hover {
+      transform: translateY(-2px);
+    }
+    
+    &::before {
+      content: '●';
+      position: absolute;
+      top: 8px;
+      left: 8px;
+      color: #ff0000;
+      font-size: 1.2rem;
+    }
+  ` : `
+    background: white;
+    border: 1px solid ${props.$colors.border};
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    
+    &:hover {
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+      border-color: ${props.$colors.primary};
+    }
+  `}
 `;
 
 const PhraseText = styled.p`
@@ -52,26 +74,45 @@ const DateText = styled.time`
   font-style: italic;
 `;
 
-const DeleteButton = styled.button`
+const DeleteButton = styled.button<{ $isRetro: boolean }>`
   padding: 0.5rem 1rem;
   font-size: 0.875rem;
   font-weight: 600;
-  color: #ff4444;
-  background: transparent;
-  border: 1px solid #ff4444;
-  border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
+  font-family: ${props => props.$isRetro ? 'Comic Sans MS, Arial, cursive' : 'inherit'};
 
-  &:hover {
-    background: #ff4444;
-    color: white;
-    transform: scale(1.05);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
+  ${props => props.$isRetro ? `
+    color: #000000;
+    background: #ff0000;
+    border: 3px outset #c0c0c0;
+    box-shadow: 2px 2px 0px #808080;
+    
+    &:hover {
+      background: #cc0000;
+    }
+    
+    &:active {
+      border-style: inset;
+      box-shadow: inset 2px 2px 0px #808080;
+      transform: translate(2px, 2px);
+    }
+  ` : `
+    color: #ff4444;
+    background: transparent;
+    border: 1px solid #ff4444;
+    border-radius: 6px;
+    
+    &:hover {
+      background: #ff4444;
+      color: white;
+      transform: scale(1.05);
+    }
+    
+    &:active {
+      transform: scale(0.98);
+    }
+  `}
 `;
 
 // ============================================================================
@@ -101,12 +142,15 @@ interface PhraseCardProps {
 }
 
 function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
+  const { theme, colors } = useTheme();
+  const isRetro = theme === 'retro';
+
   const handleDelete = () => {
     onDelete(phrase.id);
   };
 
   return (
-    <Card>
+    <Card $isRetro={isRetro} $colors={colors}>
       <PhraseText>{phrase.text}</PhraseText>
       <CardFooter>
         <DateText dateTime={new Date(phrase.createdAt).toISOString()}>
@@ -115,6 +159,7 @@ function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
         <DeleteButton
           onClick={handleDelete}
           aria-label={`Eliminar frase: ${phrase.text}`}
+          $isRetro={isRetro}
         >
           Eliminar
         </DeleteButton>
