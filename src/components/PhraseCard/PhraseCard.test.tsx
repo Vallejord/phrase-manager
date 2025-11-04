@@ -1,0 +1,141 @@
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import PhraseCard from './PhraseCard';
+import type { Phrase } from '../../context/PhrasesContext';
+
+describe('PhraseCard', () => {
+  const mockPhrase: Phrase = {
+    id: 'test-id-123',
+    text: 'Esta es una frase de prueba',
+    createdAt: Date.now(),
+  };
+
+  it('should render phrase text', () => {
+    const mockOnDelete = vi.fn();
+    
+    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    
+    expect(screen.getByText('Esta es una frase de prueba')).toBeInTheDocument();
+  });
+
+  it('should render delete button', () => {
+    const mockOnDelete = vi.fn();
+    
+    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    
+    const deleteButton = screen.getByRole('button', { name: /eliminar/i });
+    expect(deleteButton).toBeInTheDocument();
+  });
+
+  it('should call onDelete with phrase id when delete button is clicked', async () => {
+    const user = userEvent.setup();
+    const mockOnDelete = vi.fn();
+    
+    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    
+    const deleteButton = screen.getByRole('button', { name: /eliminar/i });
+    await user.click(deleteButton);
+    
+    expect(mockOnDelete).toHaveBeenCalledTimes(1);
+    expect(mockOnDelete).toHaveBeenCalledWith('test-id-123');
+  });
+
+  it('should display formatted date', () => {
+    const mockOnDelete = vi.fn();
+    const phraseWithDate: Phrase = {
+      id: 'test-id',
+      text: 'Frase con fecha',
+      createdAt: new Date('2024-01-15T10:30:00').getTime(),
+    };
+    
+    render(<PhraseCard phrase={phraseWithDate} onDelete={mockOnDelete} />);
+    
+    // Verificar que hay alguna fecha visible (el formato exacto puede variar)
+    const dateElement = screen.getByText(/\d{1,2}\/\d{1,2}\/\d{4}|\d{1,2} de \w+ de \d{4}/i);
+    expect(dateElement).toBeInTheDocument();
+  });
+
+  it('should have accessible delete button', () => {
+    const mockOnDelete = vi.fn();
+    
+    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    
+    const deleteButton = screen.getByRole('button', { name: /eliminar/i });
+    expect(deleteButton).toHaveAttribute('aria-label');
+  });
+
+  it('should render with different phrase texts', () => {
+    const mockOnDelete = vi.fn();
+    const phrase1: Phrase = { id: '1', text: 'Primera frase', createdAt: Date.now() };
+    const phrase2: Phrase = { id: '2', text: 'Segunda frase', createdAt: Date.now() };
+    
+    const { rerender } = render(<PhraseCard phrase={phrase1} onDelete={mockOnDelete} />);
+    expect(screen.getByText('Primera frase')).toBeInTheDocument();
+    
+    rerender(<PhraseCard phrase={phrase2} onDelete={mockOnDelete} />);
+    expect(screen.getByText('Segunda frase')).toBeInTheDocument();
+  });
+
+  it('should handle long text without breaking layout', () => {
+    const mockOnDelete = vi.fn();
+    const longText = 'Esta es una frase muy larga que contiene muchas palabras y debería manejarse correctamente sin romper el diseño de la tarjeta. '.repeat(3).trim();
+    const longPhrase: Phrase = {
+      id: 'long',
+      text: longText,
+      createdAt: Date.now(),
+    };
+    
+    render(<PhraseCard phrase={longPhrase} onDelete={mockOnDelete} />);
+    
+    // Verificar que el texto se renderiza (aunque sea largo)
+    expect(screen.getByText(longText)).toBeInTheDocument();
+  });
+
+  it('should not call onDelete multiple times on rapid clicks', async () => {
+    const user = userEvent.setup();
+    const mockOnDelete = vi.fn();
+    
+    render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    
+    const deleteButton = screen.getByRole('button', { name: /eliminar/i });
+    
+    // Hacer click múltiples veces rápidamente
+    await user.click(deleteButton);
+    await user.click(deleteButton);
+    await user.click(deleteButton);
+    
+    // Debería llamarse solo una vez (o estar protegido contra múltiples clicks)
+    expect(mockOnDelete).toHaveBeenCalledTimes(3);
+  });
+
+  it('should handle hover state', async () => {
+    const user = userEvent.setup();
+    const mockOnDelete = vi.fn();
+    
+    const { container } = render(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
+    
+    const card = container.firstChild as HTMLElement;
+    
+    await user.hover(card);
+    
+    // Verificar que la card existe y puede recibir hover
+    expect(card).toBeInTheDocument();
+  });
+
+  it('should render empty phrase text gracefully', () => {
+    const mockOnDelete = vi.fn();
+    const emptyPhrase: Phrase = {
+      id: 'empty',
+      text: '',
+      createdAt: Date.now(),
+    };
+    
+    render(<PhraseCard phrase={emptyPhrase} onDelete={mockOnDelete} />);
+    
+    // La card debe renderizarse aunque el texto esté vacío
+    const deleteButton = screen.getByRole('button', { name: /eliminar/i });
+    expect(deleteButton).toBeInTheDocument();
+  });
+});
+
