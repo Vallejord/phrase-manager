@@ -129,16 +129,16 @@ export default function SearchBar() {
     <SearchContainer>
       <SearchWrapper $isRetro={isRetro} $colors={colors}>
         <SearchIcon aria-hidden="true">🔍</SearchIcon>
-        <Input
-          ref={inputRef}
-          type="text"
-          value={searchTerm}
-          onChange={handleInputChange}
-          placeholder="Buscar frases..."
-          aria-label="Buscar frases"
-          autoComplete="off"
-          $isRetro={isRetro}
-        />
+                <Input
+                  ref={inputRef}
+                  type="text"
+                  value={searchTerm}
+                  onChange={handleInputChange}
+                  placeholder="Buscar por frase o autor..."
+                  aria-label="Buscar por frase o autor"
+                  autoComplete="off"
+                  $isRetro={isRetro}
+                />
         {searchTerm && (
           <ClearButton
             type="button"

@@ -30,7 +30,7 @@ describe('App - Integration Tests', () => {
     expect(screen.getByRole('button', { name: /agregar/i })).toBeInTheDocument();
     
     // Search section
-    expect(screen.getByPlaceholderText(/buscar frases/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/buscar por frase o autor/i)).toBeInTheDocument();
     
     // Empty state
     expect(screen.getByText(/no hay frases todavía/i)).toBeInTheDocument();
@@ -71,7 +71,7 @@ describe('App - Integration Tests', () => {
     await user.click(addButton);
     
     // Buscar una frase específica
-    const searchInput = screen.getByPlaceholderText(/buscar frases/i);
+    const searchInput = screen.getByPlaceholderText(/buscar por frase o autor/i);
     await user.type(searchInput, 'JavaScript');
     
     // Verificar resultados del filtro
@@ -119,7 +119,7 @@ describe('App - Integration Tests', () => {
     await user.click(addButton);
     
     // Buscar
-    const searchInput = screen.getByPlaceholderText(/buscar frases/i);
+    const searchInput = screen.getByPlaceholderText(/buscar por frase o autor/i);
     await user.type(searchInput, 'uno');
     
     expect(screen.getByText('Frase uno')).toBeInTheDocument();

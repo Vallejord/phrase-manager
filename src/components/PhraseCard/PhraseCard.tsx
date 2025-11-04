@@ -18,12 +18,13 @@ const Card = styled.article<{ $isRetro: boolean; $colors: any }>`
   font-family: ${props => props.$isRetro ? 'Comic Sans MS, Arial, cursive' : 'inherit'};
 
   ${props => props.$isRetro ? `
-    background: ${props.$colors.cardBackground};
-    border: 4px outset #c0c0c0;
-    box-shadow: 5px 5px 0px #808080;
+    background: #ffffff;
+    border: 5px ridge #808080;
+    box-shadow: 8px 8px 0px #000000;
     
     &:hover {
-      transform: translateY(-2px);
+      transform: translate(-2px, -2px);
+      box-shadow: 10px 10px 0px #000000;
     }
     
     &::before {
@@ -48,11 +49,12 @@ const Card = styled.article<{ $isRetro: boolean; $colors: any }>`
   `}
 `;
 
-const PhraseText = styled.p`
+const PhraseText = styled.p<{ $isRetro?: boolean }>`
   margin: 0;
   font-size: 1rem;
   line-height: 1.6;
-  color: #333;
+  color: ${props => props.$isRetro ? '#000000' : '#333'};
+  font-weight: ${props => props.$isRetro ? '600' : 'normal'};
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
@@ -74,10 +76,11 @@ const CardMeta = styled.div`
   gap: 1rem;
 `;
 
-const AuthorText = styled.div`
+const AuthorText = styled.div<{ $isRetro?: boolean }>`
   font-size: 0.85rem;
-  color: #666;
-  font-weight: 600;
+  color: ${props => props.$isRetro ? '#0000ff' : '#666'};
+  font-weight: 700;
+  font-style: ${props => props.$isRetro ? 'normal' : 'italic'};
 `;
 
 const DateText = styled.time`
@@ -163,11 +166,11 @@ function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
 
   return (
     <Card $isRetro={isRetro} $colors={colors}>
-      <PhraseText>{phrase.text}</PhraseText>
+      <PhraseText $isRetro={isRetro}>{phrase.text}</PhraseText>
       <CardFooter>
         <CardMeta>
           <div>
-            <AuthorText>— {phrase.author}</AuthorText>
+            <AuthorText $isRetro={isRetro}>— {phrase.author}</AuthorText>
             <DateText dateTime={new Date(phrase.createdAt).toISOString()}>
               {formatDate(phrase.createdAt)}
             </DateText>

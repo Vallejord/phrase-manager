@@ -19,7 +19,7 @@ describe('SearchBar', () => {
   it('should render search input', () => {
     renderWithProviders(<SearchBar />);
 
-    expect(screen.getByPlaceholderText(/buscar frases/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/buscar por frase o autor/i)).toBeInTheDocument();
   });
 
   it('should update input value when typing', async () => {
@@ -27,7 +27,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     
     await user.type(input, 'test');
     
@@ -47,7 +47,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     
     await user.type(input, 'test');
     
@@ -69,7 +69,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     
     await user.type(input, 'test');
     expect(input).toHaveValue('test');
@@ -83,7 +83,7 @@ describe('SearchBar', () => {
   it('should have accessible label', () => {
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     expect(input).toHaveAttribute('aria-label');
   });
 
@@ -92,7 +92,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     await user.type(input, 'test');
     
     // El input debe tener el valor
@@ -104,7 +104,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     
     await user.type(input, 'abcdefghijklmnopqrstuvwxyz');
     
@@ -116,7 +116,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     
     await user.type(input, 'test');
     
@@ -132,7 +132,7 @@ describe('SearchBar', () => {
     
     renderWithProviders(<SearchBar />);
 
-    const input = screen.getByPlaceholderText(/buscar frases/i);
+    const input = screen.getByPlaceholderText(/buscar por frase o autor/i);
     await user.type(input, '!@#$%^&*()');
     
     expect(input).toHaveValue('!@#$%^&*()');

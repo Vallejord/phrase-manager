@@ -9,6 +9,7 @@ import type { Phrase } from '../context/PhrasesContext';
  * @returns Array de frases filtradas
  * 
  * Optimización: Usa useMemo para evitar recalcular el filtrado en cada render
+ * Busca en: texto de la frase y autor
  */
 export function usePhrasesFilter(phrases: Phrase[], searchTerm: string): Phrase[] {
   const filteredPhrases = useMemo(() => {
@@ -20,10 +21,12 @@ export function usePhrasesFilter(phrases: Phrase[], searchTerm: string): Phrase[
     // Normalizar el término de búsqueda (lowercase y trim)
     const normalizedSearchTerm = searchTerm.toLowerCase().trim();
 
-    // Filtrar frases que contengan el término de búsqueda (case insensitive)
-    return phrases.filter((phrase) =>
-      phrase.text.toLowerCase().includes(normalizedSearchTerm)
-    );
+    // Filtrar frases que contengan el término en el texto o en el autor (case insensitive)
+    return phrases.filter((phrase) => {
+      const textMatch = phrase.text.toLowerCase().includes(normalizedSearchTerm);
+      const authorMatch = phrase.author.toLowerCase().includes(normalizedSearchTerm);
+      return textMatch || authorMatch;
+    });
   }, [phrases, searchTerm]);
 
   return filteredPhrases;
