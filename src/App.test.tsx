@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PhrasesProvider } from './context/PhrasesContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -74,9 +74,11 @@ describe('App - Integration Tests', () => {
     const searchInput = screen.getByPlaceholderText(/buscar por frase o autor/i);
     await user.type(searchInput, 'JavaScript');
     
-    // Verificar resultados del filtro
-    expect(screen.getByText('JavaScript es genial')).toBeInTheDocument();
-    expect(screen.queryByText('Python es poderoso')).not.toBeInTheDocument();
+    // Esperar el debounce de 300ms
+    await waitFor(() => {
+      expect(screen.getByText('JavaScript es genial')).toBeInTheDocument();
+      expect(screen.queryByText('Python es poderoso')).not.toBeInTheDocument();
+    }, { timeout: 500 });
   });
 
   it('should delete a phrase', async () => {
@@ -122,8 +124,11 @@ describe('App - Integration Tests', () => {
     const searchInput = screen.getByPlaceholderText(/buscar por frase o autor/i);
     await user.type(searchInput, 'uno');
     
-    expect(screen.getByText('Frase uno')).toBeInTheDocument();
-    expect(screen.queryByText('Frase dos')).not.toBeInTheDocument();
+    // Esperar el debounce
+    await waitFor(() => {
+      expect(screen.getByText('Frase uno')).toBeInTheDocument();
+      expect(screen.queryByText('Frase dos')).not.toBeInTheDocument();
+    }, { timeout: 500 });
     
     // Limpiar búsqueda
     const clearButton = screen.getByRole('button', { name: /limpiar búsqueda/i });

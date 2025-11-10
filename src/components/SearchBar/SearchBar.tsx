@@ -1,7 +1,8 @@
-import { useRef, ChangeEvent } from 'react';
+import { useRef, ChangeEvent, useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { usePhrases } from '../../context/PhrasesContext';
 import { useTheme } from '../../context/ThemeContext';
+import { useDebounce } from '../../hooks/useDebounce';
 
 // ============================================================================
 // Styled Components
@@ -110,16 +111,28 @@ const ClearButton = styled.button<{ $isRetro: boolean }>`
 // ============================================================================
 
 export default function SearchBar() {
-  const { searchTerm, setSearchTerm } = usePhrases();
+  const { setSearchTerm } = usePhrases();
   const { theme, colors } = useTheme();
   const inputRef = useRef<HTMLInputElement>(null);
   const isRetro = theme === 'retro';
 
+  // Estado local para el input (respuesta inmediata)
+  const [inputValue, setInputValue] = useState('');
+  
+  // Valor debounced (para actualizar el contexto con delay)
+  const debouncedValue = useDebounce(inputValue, 300);
+
+  // Sincronizar el valor debounced con el contexto
+  useEffect(() => {
+    setSearchTerm(debouncedValue);
+  }, [debouncedValue, setSearchTerm]);
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setSearchTerm(e.target.value);
+    setInputValue(e.target.value);
   };
 
   const handleClear = () => {
+    setInputValue('');
     setSearchTerm('');
     // Mantener el foco en el input después de limpiar
     inputRef.current?.focus();
@@ -129,17 +142,17 @@ export default function SearchBar() {
     <SearchContainer>
       <SearchWrapper $isRetro={isRetro} $colors={colors}>
         <SearchIcon aria-hidden="true">🔍</SearchIcon>
-                <Input
-                  ref={inputRef}
-                  type="text"
-                  value={searchTerm}
-                  onChange={handleInputChange}
-                  placeholder="Buscar por frase o autor..."
-                  aria-label="Buscar por frase o autor"
-                  autoComplete="off"
-                  $isRetro={isRetro}
-                />
-        {searchTerm && (
+        <Input
+          ref={inputRef}
+          type="text"
+          value={inputValue}
+          onChange={handleInputChange}
+          placeholder="Buscar por frase o autor..."
+          aria-label="Buscar por frase o autor"
+          autoComplete="off"
+          $isRetro={isRetro}
+        />
+        {inputValue && (
           <ClearButton
             type="button"
             onClick={handleClear}

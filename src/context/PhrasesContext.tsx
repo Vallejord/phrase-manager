@@ -1,4 +1,4 @@
-import { createContext, useContext, useReducer, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useReducer, useEffect, useCallback, useMemo, ReactNode } from 'react';
 
 // ============================================================================
 // Constants
@@ -136,25 +136,27 @@ export function PhrasesProvider({ children }: PhrasesProviderProps) {
     saveToStorage(state);
   }, [state.phrases]); // Solo cuando cambian las frases
 
-  const addPhrase = (text: string, author?: string) => {
+  // Memoizar las funciones para evitar re-renders innecesarios
+  const addPhrase = useCallback((text: string, author?: string) => {
     dispatch({ type: 'ADD_PHRASE', payload: { text, author: author || 'Desconocido' } });
-  };
+  }, []);
 
-  const deletePhrase = (id: string) => {
+  const deletePhrase = useCallback((id: string) => {
     dispatch({ type: 'DELETE_PHRASE', payload: id });
-  };
+  }, []);
 
-  const setSearchTerm = (term: string) => {
+  const setSearchTerm = useCallback((term: string) => {
     dispatch({ type: 'SET_SEARCH_TERM', payload: term });
-  };
+  }, []);
 
-  const value: PhrasesContextType = {
+  // Memoizar el value del contexto
+  const value: PhrasesContextType = useMemo(() => ({
     phrases: state.phrases,
     searchTerm: state.searchTerm,
     addPhrase,
     deletePhrase,
     setSearchTerm,
-  };
+  }), [state.phrases, state.searchTerm, addPhrase, deletePhrase, setSearchTerm]);
 
   return (
     <PhrasesContext.Provider value={value}>
