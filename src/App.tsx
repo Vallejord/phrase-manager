@@ -6,6 +6,7 @@ import PhraseForm from './components/PhraseForm/PhraseForm';
 import SearchBar from './components/SearchBar/SearchBar';
 import PhraseGrid from './components/PhraseGrid/PhraseGrid';
 import AnnouncementRegion from './components/AnnouncementRegion/AnnouncementRegion';
+import ErrorBoundary from './components/ErrorBoundary/ErrorBoundary';
 
 // ============================================================================
 // Styled Components
@@ -174,7 +175,9 @@ function App() {
         </SearchSection>
 
         <GridSection $isRetro={isRetro}>
-          <PhraseGrid />
+          <ErrorBoundary isRetro={isRetro}>
+            <PhraseGrid />
+          </ErrorBoundary>
         </GridSection>
       </ContentWrapper>
     </AppContainer>
