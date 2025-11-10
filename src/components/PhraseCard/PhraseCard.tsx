@@ -58,6 +58,13 @@ const PhraseText = styled.p<{ $isRetro?: boolean }>`
   word-wrap: break-word;
   overflow-wrap: break-word;
   hyphens: auto;
+  
+  /* Truncado multi-línea: máximo 3 líneas */
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const CardFooter = styled.div`
