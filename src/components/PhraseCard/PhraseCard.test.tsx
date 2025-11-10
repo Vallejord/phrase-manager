@@ -37,7 +37,7 @@ describe('PhraseCard', () => {
     expect(deleteButton).toBeInTheDocument();
   });
 
-  it('should call onDelete with phrase id when delete button is clicked', async () => {
+  it('should call onDelete with phrase id when delete button is clicked and confirmed', async () => {
     const user = userEvent.setup();
     const mockOnDelete = vi.fn();
     
@@ -45,6 +45,13 @@ describe('PhraseCard', () => {
     
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });
     await user.click(deleteButton);
+    
+    // Debe aparecer el dialog de confirmación
+    expect(screen.getByText(/¿eliminar frase\?/i)).toBeInTheDocument();
+    
+    // Confirmar la eliminación
+    const confirmButton = screen.getByRole('button', { name: /^eliminar$/i });
+    await user.click(confirmButton);
     
     expect(mockOnDelete).toHaveBeenCalledTimes(1);
     expect(mockOnDelete).toHaveBeenCalledWith('test-id-123');
@@ -101,21 +108,22 @@ describe('PhraseCard', () => {
     expect(screen.getByText(longText)).toBeInTheDocument();
   });
 
-  it('should not call onDelete multiple times on rapid clicks', async () => {
+  it('should show cancel button in confirmation dialog', async () => {
     const user = userEvent.setup();
     const mockOnDelete = vi.fn();
     
     renderWithProviders(<PhraseCard phrase={mockPhrase} onDelete={mockOnDelete} />);
     
     const deleteButton = screen.getByRole('button', { name: /eliminar/i });
-    
-    // Hacer click múltiples veces rápidamente
-    await user.click(deleteButton);
-    await user.click(deleteButton);
     await user.click(deleteButton);
     
-    // Debería llamarse solo una vez (o estar protegido contra múltiples clicks)
-    expect(mockOnDelete).toHaveBeenCalledTimes(3);
+    // Debe aparecer el dialog con botón de cancelar
+    const cancelButton = screen.getByRole('button', { name: /cancelar/i });
+    expect(cancelButton).toBeInTheDocument();
+    
+    // Cancelar - no debería eliminar
+    await user.click(cancelButton);
+    expect(mockOnDelete).not.toHaveBeenCalled();
   });
 
   it('should handle hover state', async () => {

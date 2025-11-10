@@ -1,9 +1,11 @@
 import styled from 'styled-components';
 import { useTheme } from './context/ThemeContext';
+import { usePhrases } from './context/PhrasesContext';
 import ThemeToggle from './components/ThemeToggle/ThemeToggle';
 import PhraseForm from './components/PhraseForm/PhraseForm';
 import SearchBar from './components/SearchBar/SearchBar';
 import PhraseGrid from './components/PhraseGrid/PhraseGrid';
+import AnnouncementRegion from './components/AnnouncementRegion/AnnouncementRegion';
 
 // ============================================================================
 // Styled Components
@@ -148,10 +150,12 @@ const GridSection = styled.section<{ $isRetro: boolean }>`
 
 function App() {
   const { theme, colors } = useTheme();
+  const { announcement } = usePhrases();
   const isRetro = theme === 'retro';
 
   return (
     <AppContainer $isRetro={isRetro} $gradient={colors.gradient}>
+      <AnnouncementRegion message={announcement} />
       <ThemeToggle />
       <ContentWrapper>
         <Header $isRetro={isRetro}>

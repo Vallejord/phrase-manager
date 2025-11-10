@@ -1,7 +1,8 @@
-import { memo } from 'react';
+import { memo, useState, useRef } from 'react';
 import styled from 'styled-components';
 import { useTheme } from '../../context/ThemeContext';
 import type { Phrase } from '../../context/PhrasesContext';
+import ConfirmDialog from '../ConfirmDialog/ConfirmDialog';
 
 // ============================================================================
 // Styled Components
@@ -166,13 +167,29 @@ interface PhraseCardProps {
 function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
   const { theme, colors } = useTheme();
   const isRetro = theme === 'retro';
+  const [showConfirm, setShowConfirm] = useState(false);
+  const deleteButtonRef = useRef<HTMLButtonElement>(null);
 
-  const handleDelete = () => {
+  const handleDeleteClick = () => {
+    setShowConfirm(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowConfirm(false);
     onDelete(phrase.id);
   };
 
+  const handleCancelDelete = () => {
+    setShowConfirm(false);
+    // Devolver el foco al botón de eliminar
+    setTimeout(() => {
+      deleteButtonRef.current?.focus();
+    }, 0);
+  };
+
   return (
-    <Card $isRetro={isRetro} $colors={colors}>
+    <>
+      <Card $isRetro={isRetro} $colors={colors}>
       <PhraseText $isRetro={isRetro}>{phrase.text}</PhraseText>
       <CardFooter>
         <CardMeta>
@@ -183,7 +200,8 @@ function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
             </DateText>
           </div>
           <DeleteButton
-            onClick={handleDelete}
+            ref={deleteButtonRef}
+            onClick={handleDeleteClick}
             aria-label={`Eliminar frase: ${phrase.text}`}
             $isRetro={isRetro}
           >
@@ -192,6 +210,18 @@ function PhraseCard({ phrase, onDelete }: PhraseCardProps) {
         </CardMeta>
       </CardFooter>
     </Card>
+
+    {showConfirm && (
+      <ConfirmDialog
+        title="¿Eliminar frase?"
+        message={`¿Estás seguro de que deseas eliminar "${phrase.text.length > 50 ? phrase.text.substring(0, 50) + '...' : phrase.text}"?`}
+        confirmLabel="Eliminar"
+        cancelLabel="Cancelar"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
+    )}
+  </>
   );
 }
 

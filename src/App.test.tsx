@@ -99,6 +99,10 @@ describe('App - Integration Tests', () => {
     const deleteButton = screen.getByRole('button', { name: /eliminar frase: frase temporal/i });
     await user.click(deleteButton);
     
+    // Confirmar en el dialog
+    const confirmButton = screen.getByRole('button', { name: /^eliminar$/i });
+    await user.click(confirmButton);
+    
     // Verificar que la frase ya no existe
     expect(screen.queryByText('Frase temporal')).not.toBeInTheDocument();
     

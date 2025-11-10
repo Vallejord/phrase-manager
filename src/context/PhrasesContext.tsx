@@ -20,17 +20,20 @@ export interface Phrase {
 interface PhrasesState {
   phrases: Phrase[];
   searchTerm: string;
+  announcement: string;
 }
 
 type PhrasesAction =
   | { type: 'ADD_PHRASE'; payload: { text: string; author: string } }
   | { type: 'DELETE_PHRASE'; payload: string }
-  | { type: 'SET_SEARCH_TERM'; payload: string };
+  | { type: 'SET_SEARCH_TERM'; payload: string }
+  | { type: 'SET_ANNOUNCEMENT'; payload: string };
 
 interface PhrasesContextType extends PhrasesState {
   addPhrase: (text: string, author?: string) => void;
   deletePhrase: (id: string) => void;
   setSearchTerm: (term: string) => void;
+  setAnnouncement: (message: string) => void;
 }
 
 // ============================================================================
@@ -39,7 +42,7 @@ interface PhrasesContextType extends PhrasesState {
 
 function loadFromStorage(): PhrasesState {
   if (typeof window === 'undefined') {
-    return { phrases: [], searchTerm: '' };
+    return { phrases: [], searchTerm: '', announcement: '' };
   }
 
   try {
@@ -49,13 +52,14 @@ function loadFromStorage(): PhrasesState {
       return {
         phrases: parsed.phrases || [],
         searchTerm: '', // No persistimos el searchTerm
+        announcement: '', // No persistimos anuncios
       };
     }
   } catch (error) {
     console.error('Error loading from localStorage:', error);
   }
 
-  return { phrases: [], searchTerm: '' };
+  return { phrases: [], searchTerm: '', announcement: '' };
 }
 
 function saveToStorage(state: PhrasesState): void {
@@ -109,6 +113,13 @@ function phrasesReducer(state: PhrasesState, action: PhrasesAction): PhrasesStat
       };
     }
 
+    case 'SET_ANNOUNCEMENT': {
+      return {
+        ...state,
+        announcement: action.payload,
+      };
+    }
+
     default:
       return state;
   }
@@ -139,24 +150,35 @@ export function PhrasesProvider({ children }: PhrasesProviderProps) {
   // Memoizar las funciones para evitar re-renders innecesarios
   const addPhrase = useCallback((text: string, author?: string) => {
     dispatch({ type: 'ADD_PHRASE', payload: { text, author: author || 'Desconocido' } });
+    dispatch({ type: 'SET_ANNOUNCEMENT', payload: `Frase agregada: ${text}` });
   }, []);
 
   const deletePhrase = useCallback((id: string) => {
+    const phrase = state.phrases.find(p => p.id === id);
     dispatch({ type: 'DELETE_PHRASE', payload: id });
-  }, []);
+    if (phrase) {
+      dispatch({ type: 'SET_ANNOUNCEMENT', payload: `Frase eliminada: ${phrase.text}` });
+    }
+  }, [state.phrases]);
 
   const setSearchTerm = useCallback((term: string) => {
     dispatch({ type: 'SET_SEARCH_TERM', payload: term });
+  }, []);
+
+  const setAnnouncement = useCallback((message: string) => {
+    dispatch({ type: 'SET_ANNOUNCEMENT', payload: message });
   }, []);
 
   // Memoizar el value del contexto
   const value: PhrasesContextType = useMemo(() => ({
     phrases: state.phrases,
     searchTerm: state.searchTerm,
+    announcement: state.announcement,
     addPhrase,
     deletePhrase,
     setSearchTerm,
-  }), [state.phrases, state.searchTerm, addPhrase, deletePhrase, setSearchTerm]);
+    setAnnouncement,
+  }), [state.phrases, state.searchTerm, state.announcement, addPhrase, deletePhrase, setSearchTerm, setAnnouncement]);
 
   return (
     <PhrasesContext.Provider value={value}>
